@@ -1,23 +1,16 @@
-# Certificate Authority generation for an Azure domain with your subdomain
+# Certificate Generation for an Azure Public IP with your DNS Prefix
 
-Many times we need a CA certificate, and this kind of certificates cost money and you need to own your domain.  
-In Azure there are services that do not support self-sign certificates, even though we are doing tests (Ex. Azure Front Door).  
-In order to do some test on Azure, we can create a valid CA certificates for free.  
-This article allows you generate a CA certificate for your subdomain inside Azure.  
-For example
+Many times we need TLS certificate issued by a public & trusted Certificate Authority, and this kind of certificate cost money and you need to own your domain. In Azure there are services that do not support self-sign certificates (Ex. Azure Front Door).  In order to do some testing on Azure, we can create a valid CA certificate for free. This article allows you generate a CA certificate for your subdomain inside Azure.
 
-```bash
-mysubdomain.eastus.cloudapp.azure.com
-```
+For example: `mysubdomain.eastus.cloudapp.azure.com`
 
-It is based on [Let's Encrypt (Let's Encrypt is a trademark of the Internet Security Research Group. All rights reserved.)](https://letsencrypt.org/). Let's Encrypt is a non-profit certificate authority run by Internet Security Research Group (ISRG) that provides X.509 certificates for Transport Layer Security (TLS) encryption at no charge
-
+It is based on [Let's Encrypt®](https://letsencrypt.org/). Let's Encrypt is a non-profit certificate authority run by Internet Security Research Group (ISRG) that provides X.509 certificates for Transport Layer Security (TLS) encryption at no charge.
 ## Prerequisites
 
 1. An Azure subscription. If you don't have an Azure subscription, you can create a [free account](https://azure.microsoft.com/free).
-1. It is needed to install [Cerbot](https://certbot.eff.org/). Certbot is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS.
-1. [Install openssl tool](https://www.openssl.org/). OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
-1. Latest [Azure CLI installed](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) or you can perform this from Azure Cloud Shell by clicking below.
+1. [Install Certbot](https://certbot.eff.org/). Certbot is a free, open source software tool for automatically using Let’s Encrypt certificates on manually-administrated websites to enable HTTPS.
+1. [Install OpenSSL](https://www.openssl.org/) command line tool. OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
+1. [Install Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) or you can perform this from Azure Cloud Shell by clicking below.
 
    [![Launch Azure Cloud Shell](https://docs.microsoft.com/azure/includes/media/cloud-shell-try-it/launchcloudshell.png)](https://shell.azure.com)
 
@@ -34,8 +27,7 @@ az account set -s XXXX
 ```
 
 - :rocket: Create the Azure resources  
-  In order to create a certificate we need to demonstrate domain control.
-  We are going to use a Azure Application Gateway on top of Azure Blob Storage to do that.
+  In order to create a certificate we need to demonstrate domain control. We are going to use a Azure Application Gateway on top of Azure Blob Storage to do that.
 
 ```bash
 # Your resource group name
@@ -46,7 +38,7 @@ LOCATION=eastus
 DOMAIN_NAME=mysubdomain
 
 # Set your domain name
-FQDN=mysubdomain.eastus.cloudapp.azure.com
+FQDN="$DOMAIN_NAME.$LOCATION.cloudapp.azure.com"
 
 # Optional, we can use an existent Public IP with dns name
 # PUBLIC_IP_RESOURCE_ID=
@@ -55,7 +47,7 @@ FQDN=mysubdomain.eastus.cloudapp.azure.com
 az group create --name "${RGNAME}" --location "${LOCATION}"
 
 # Resource deployment. Public Ip (with DNS name), Virtual Network, Storage Account and Application Gateway
-az deployment group create -g "${RGNAME}" --template-file "resources-stamp.json"  --name "cert-0001" --parameters location=$LOCATION subdomainName=$DOMAIN_NAME #ipResourceId=$PUBLIC_IP_RESOURCE_ID
+az deployment group create -g "${RGNAME}" -f "resources-stamp.json"  --name "cert-0001" -p location=$LOCATION subdomainName=$DOMAIN_NAME #ipResourceId=$PUBLIC_IP_RESOURCE_ID
 
 # Getting the Storage account name
 STORAGE_ACCOUNT_NAME=$(az deployment group show -g $RGNAME -n cert-0001 --query properties.outputs.storageAccountName.value -o tsv)
@@ -94,14 +86,6 @@ echo http://$FQDN/.well-known/acme-challenge/test
 ```
 
 - :key: Generate certificate base on [Cerbot](https://certbot.eff.org/)
-
-Installing cerbot using linux could be as easy as
-
-```bash
-sudo apt-get install certbot
-```
-
-You can check how to install in your platform in the [Cerbot](https://certbot.eff.org/) site.
 
 Please, Execute a command like the following with administration privilege
 
@@ -164,7 +148,6 @@ openssl pkcs12 -export -out $DOMAIN_NAME.pfx -inkey privkey.pem -in cert.pem -ce
 
 ```bash
 az group delete -n $RGNAME --yes
-
 ```
 
 ### :book: Generate extra certificate
@@ -188,7 +171,7 @@ DOMAIN_NAME=mysecondsubdomain
 cd ..
 ```
 
-4. Start again on the step "Generate certificate base on [Cerbot](https://certbot.eff.org/)"
+4. Start again on the step "Generate certificate base on [Certbot](https://certbot.eff.org/)"
 
 
 ## Scripting Cert Generation
@@ -206,4 +189,7 @@ Please see our [contributor guide](./CONTRIBUTING.md).
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact <opencode@microsoft.com> with any additional questions or comments.
 
-With :heart: from Microsoft Patterns & Practices, [Azure Architecture Center](https://aka.ms/architecture).
+With :heart: from Microsoft Patterns & Practices, [Azure Architecture Center](https://aka.ms/architecture).  
+  
+  
+Let's Encrypt is a trademark of the Internet Security Research Group. All rights reserved.

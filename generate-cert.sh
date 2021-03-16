@@ -31,10 +31,6 @@ az storage blob upload \
  --file ./test.txt \
  --auth-mode key
 
-echo https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/verificationdata/test.txt
-echo http://$FQDN/verificationdata/test.txt
-echo http://$FQDN/.well-known/acme-challenge/test
-
 sudo certbot certonly --manual --manual-auth-hook "./authenticator.sh $STORAGE_ACCOUNT_NAME $STORAGE_CONNECTION_STRING" -d $FQDN
 
 sudo cp /etc/letsencrypt/live/$FQDN/privkey.pem .
@@ -48,4 +44,4 @@ rm test.txt
 rm privkey.pem
 rm cert.pem
 rm chain.pem
-echo "Check you have $SUBDOMAIN.pfx in the directory"
+echo "Your certificate: $SUBDOMAIN.pfx"

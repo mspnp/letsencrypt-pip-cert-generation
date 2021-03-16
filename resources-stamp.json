@@ -42,8 +42,7 @@
                 "idleTimeoutInMinutes": 4,
                 "publicIPAddressVersion": "IPv4",
                 "dnsSettings": {
-                    "domainNameLabel": "[variables('subdomain')]",
-                    "fqdn":  "[concat(variables('subdomain'),'.',parameters('location'),'.cloudapp.azure.com')]"
+                    "domainNameLabel": "[variables('subdomain')]"
                 },
                 "ipTags": []
             }
@@ -116,22 +115,13 @@
                     ]
                 },
                 "subnets": [
-                    {
-                        "name": "default",
-                        "properties": {
-                            "addressPrefix": "172.20.0.0/24",
-                            "delegations": [],
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
-                        }
-                    }
                 ],
                 "virtualNetworkPeerings": [],
                 "enableDdosProtection": false,
                 "enableVmProtection": false
             }
         },
-        {
+        {  
             "type": "Microsoft.Network/virtualNetworks/subnets",
             "apiVersion": "2020-05-01",
             "name": "[concat(variables('subdomain'), '/default')]",
@@ -303,7 +293,7 @@
                 "enableHttp2": false,
                 "autoscaleConfiguration": {
                     "minCapacity": 0,
-                    "maxCapacity": 10
+                    "maxCapacity": 2
                 }
             }
         }
