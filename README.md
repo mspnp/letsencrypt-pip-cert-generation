@@ -76,13 +76,13 @@ az storage blob upload \
 
 ```bash
 # We can access the file inside the blob
-echo https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/verificationdata/test.txt
+curl https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/verificationdata/test.txt
 
 # The Azure Application Gateway is exposing the Azure Blob
-echo http://$FQDN/verificationdata/test.txt
+curl http://$FQDN/verificationdata/test.txt
 
 # The Azure Application Gateway rewrite rule is working
-echo http://$FQDN/.well-known/acme-challenge/test
+curl http://$FQDN/.well-known/acme-challenge/test
 ```
 
 - :key: Generate certificate base on [Cerbot](https://certbot.eff.org/)
@@ -114,7 +114,7 @@ az storage blob upload \
 4. Test the url presented by cerbot, Ex:
 
 ```bash
-http://mysubdomain.eastus.cloudapp.azure.com/.well-known/acme-challenge/-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk
+curl http://mysubdomain.eastus.cloudapp.azure.com/.well-known/acme-challenge/-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk
 ```
 
 5. If the test is working, please press Enter
@@ -175,10 +175,7 @@ cd ..
 
 
 ## Scripting Cert Generation
-It is an option to generate the certificate running a script which will execute automatically all for you.
-It will generate subdomain.pfx in your directory.  
-All the resources are created, then the certificate is generated, and finally the resources are deleted. 
-The script generate the certificate for a PIP (Public IP) which already exist (the last parameter). Anyway, you could delete that parameter and adjust the script.
+It is an option to generate the certificate running a script which will execute automatically all for you. It will generate subdomain.pfx in your directory. All the resources are created, then the certificate is generated, and finally the resources are deleted. The script generate the certificate for a PIP (Public IP) which already exist (the last parameter). Anyway, you could delete that parameter and adjust the script.
 
 ```bash
 ./generate-cert.sh <location> <subdomain> <FQDN> <PIP resource Id>
