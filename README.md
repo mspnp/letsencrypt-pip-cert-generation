@@ -47,7 +47,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    az group create -n $RGNAME -l $LOCATION
    
    # Resource deployment. Public IP (with DNS prefix), Virtual Network, Storage Account and Application Gateway
-   az deployment group create -g $RGNAME -f resources-stamp.json --name cert-0001 -p location=${LOCATION} subdomainName=$   {DOMAIN_NAME} #ipResourceId=${PUBLIC_IP_RESOURCE_ID}
+   az deployment group create -g $RGNAME -f resources-stamp.json --name cert-0001 -p location=${LOCATION} subdomainName=${DOMAIN_NAME} #ipResourceId=${PUBLIC_IP_RESOURCE_ID}
    
    # Get the Azure Storage Account name
    STORAGE_ACCOUNT_NAME=$(az deployment group show -g $RGNAME -n cert-0001 --query properties.outputs.storageAccountName.value -o tsv)
@@ -134,10 +134,10 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
 
       ```bash
       # Password-less
-      openssl pkcs12 -export -out ${DOMAIN_NAME}.pfx -inkey privkey.pem -in cert.pem -certfile       chain.pem -passout pass:
+      openssl pkcs12 -export -out ${DOMAIN_NAME}.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem -passout pass:
       
       # Or with password
-      openssl pkcs12 -export -out ${DOMAIN_NAME}.pfx -inkey privkey.pem -in cert.pem -certfile       chain.pem
+      openssl pkcs12 -export -out ${DOMAIN_NAME}.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem
       ```
 
 - :thumbsup: You have your CA valid pfx certificate for your domain on the directory.
@@ -174,11 +174,12 @@ If you need to generate more certificates in *the same region*, before deleting 
 
 1. Start again on the step "Generate certificate base on [Certbot](https://certbot.eff.org/)"
 
-## Scripting Cert Generation
-It is an option to generate the certificate running a script which will execute automatically all for you. It will generate subdomain.pfx in your directory. All the resources are created, then the certificate is generated, and finally the resources are deleted. The script generate the certificate for a PIP (Public IP) which already exist (the last parameter). Anyway, you could delete that parameter and adjust the script.
+## Scripting certificate generation
+
+It is an option to generate the certificate running a script which will execute automatically all for you. It will generate subdomain.pfx in your directory. All the resources are created, then the certificate is generated, and finally the resources are deleted. The script generates the certificate for a PIP (Public IP) which already exist.
 
 ```bash
-./generate-cert.sh <location> <subdomain> <FQDN> <PIP resource Id>
+./generate-cert.sh <Existing PIP resource Id>
 ```
 ## Contributions
 
