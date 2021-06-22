@@ -36,7 +36,7 @@ sudo cp /etc/letsencrypt/live/${FQDN}/chain.pem .
 openssl pkcs12 -export -out ${SUBDOMAIN}.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem -passout pass:
 
 echo "Deleting Azure resources"
-#az group delete -n $RGNAME --yes
+az group delete -n $RGNAME --yes
 
 echo "Deleting temporary local files"
 rm ping.txt
