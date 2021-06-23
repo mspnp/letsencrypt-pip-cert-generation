@@ -1,6 +1,6 @@
 # Certificate Generation for an Azure Public IP with your DNS Prefix
 
-Many times we need TLS certificate issued by a public and trusted certificate authority, and this kind of certificate typically costs money and you need to own your domain. In Azure there are services that do not support self-signed certificates (Ex. Azure Front Door).  In order to do some testing on Azure, we can create a public and valid CA certificate for free. This article allows you generate a CA certificate for your Public IP's domain prefix (i.e. `your-prefix.the-region.cloudapp.azure.com`).
+In Azure there are services that do not support self-signed certificates (Ex. Azure Front Door).  In order to do some testing on Azure, we can create a public and valid CA certificate for free. This article allows you generate a CA certificate for your Public IP's domain prefix (i.e. `your-prefix.the-region.cloudapp.azure.com`).
 
 It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a non-profit certificate authority run by Internet Security Research Group (ISRG) that provides X.509 certificates for Transport Layer Security (TLS) encryption at no charge.
 ## Prerequisites
@@ -20,7 +20,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    ## Login into Azure and set your subscription
 
    az login
-   az account set -s XXXX
+   az account set -s <subscription-id>
    ```
 
 - :rocket: Create the Azure resources  
@@ -176,7 +176,7 @@ If you need to generate more certificates in *the same region*, before deleting 
 
 ## Scripting certificate generation
 
-It is an option to generate the certificate running a script which will execute automatically all for you. It will generate subdomain.pfx in your directory. All the resources are created, then the certificate is generated, and finally the resources are deleted. The script generates the certificate for a PIP (Public IP) which already exist.
+It is an option to generate the certificate running a script which will execute automatically all for you. It will generate `subdomain.pfx` in your directory. All the resources are created, then the certificate is generated, and finally the resources are deleted. The script generates the certificate for a PIP (Public IP) which already exist.
 
 ```bash
 ./generate-cert.sh <Existing PIP resource Id>
