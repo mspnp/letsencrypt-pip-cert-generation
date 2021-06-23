@@ -1,3 +1,5 @@
+#!/bin/bash
+
 STORAGE_ACCOUNT_NAME=$1
 
 echo $CERTBOT_VALIDATION>${CERTBOT_TOKEN}.txt

@@ -1,8 +1,9 @@
+#!/bin/bash -x
+
 IP_RESOURCE_ID=$1
 
 LOCATION=$(az network public-ip show --ids $IP_RESOURCE_ID --query location -o tsv)
 RGNAME="rg-lets-encrypt-cert-validator-${LOCATION}"
-
 FQDN=$(az network public-ip show --ids $IP_RESOURCE_ID --query dnsSettings.fqdn -o tsv)
 SUBDOMAIN=$(az network public-ip show --ids $IP_RESOURCE_ID --query dnsSettings.domainNameLabel -o tsv)
 
@@ -27,21 +28,16 @@ echo pong>ping.txt
 az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode key
 
 echo "Starting cert generation and validation"
-sudo certbot certonly --manual --manual-auth-hook "./authenticator.sh ${STORAGE_ACCOUNT_NAME}" -d $FQDN
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+certbot certonly --manual --manual-auth-hook "${DIR}/authenticator.sh ${STORAGE_ACCOUNT_NAME}" -d $FQDN --config-dir ./certs/etc/letsencrypt --work-dir ./certs/var/lib/letsencrypt --logs-dir ./certs/var/log/letsencrypt
 
 echo "Converting cert to pfx"
-sudo cp /etc/letsencrypt/live/${FQDN}/privkey.pem .
-sudo cp /etc/letsencrypt/live/${FQDN}/cert.pem .
-sudo cp /etc/letsencrypt/live/${FQDN}/chain.pem .
-openssl pkcs12 -export -out ${SUBDOMAIN}.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem -passout pass:
+openssl pkcs12 -export -out ${SUBDOMAIN}.pfx -inkey ./certs/etc/letsencrypt/live/${FQDN}/privkey.pem -in ./certs/etc/letsencrypt/live/${FQDN}/cert.pem -certfile ./certs/etc/letsencrypt/live/${FQDN}/chain.pem -passout pass:
 
 echo "Deleting Azure resources"
-az group delete -n $RGNAME --yes
+az group delete -n $RGNAME --yes --no-wait
 
 echo "Deleting temporary local files"
-rm ping.txt
-rm privkey.pem
-rm cert.pem
-rm chain.pem
+rm -rf ./certs ./ping.txt
 
 echo "Your certificate: ${SUBDOMAIN}.pfx"
