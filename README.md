@@ -84,7 +84,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    Execute a command like the following with administration privilege.
 
    ```bash
-   sudo certbot certonly --email changeme@mail.com -d $FQDN --agree-tos --manual
+   certbot certonly --email changeme@mail.com --agree-tos --manual --manual-auth-hook "./authenticator.sh ${STORAGE_ACCOUNT_NAME}" -d $FQDN --config-dir ./certs/etc/letsencrypt --work-dir ./certs/var/lib/letsencrypt --logs-dir ./certs/var/log/letsencrypt
    ```
 
    Before pressing Enter, you need to follow the Certbot instructions in another console window.
@@ -120,19 +120,11 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
 
 - :page_with_curl: We need to generate the pfx
 
-   1. Take the key files
-
-      ```bash
-      mkdir files
-      sudo cp /etc/letsencrypt/live/${FQDN}/privkey.pem ./files
-      sudo cp /etc/letsencrypt/live/${FQDN}/cert.pem ./files
-      sudo cp /etc/letsencrypt/live/${FQDN}/chain.pem ./files
-      cd files
-      ```
-
    1. Generate pfx with or without password as you need
 
       ```bash
+      cd ./certs/etc/letsencrypt/live/${FQDN}/
+
       # Password-less
       openssl pkcs12 -export -out ${DOMAIN_NAME}.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem -passout pass:
       
@@ -169,7 +161,7 @@ If you need to generate more certificates in *the same region*, before deleting 
 1. Go back to the root folder
 
    ```bash
-   cd ..
+   cd -
    ```
 
 1. Start again on the step "Generate certificate base on [Certbot](https://certbot.eff.org/)"
