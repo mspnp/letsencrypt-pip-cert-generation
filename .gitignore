@@ -1,0 +1,4 @@
+certs/*
+*.pfx
+*.pem
+ping.txt
