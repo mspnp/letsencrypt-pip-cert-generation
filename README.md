@@ -47,7 +47,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    az group create -n $RGNAME -l $LOCATION
    
    # Resource deployment. Public IP (with DNS prefix), Virtual Network, Storage Account and Application Gateway
-   az deployment group create -g $RGNAME -f resources-stamp.json --name cert-0001 -p location=${LOCATION} subdomainName=${DOMAIN_NAME} #ipResourceId=${PUBLIC_IP_RESOURCE_ID}
+   az deployment group create -g $RGNAME -f resources-stamp.bicep --name cert-0001 -p location=${LOCATION} subdomainName=${DOMAIN_NAME} #ipResourceId=${PUBLIC_IP_RESOURCE_ID}
    
    # Get the Azure Storage Account name
    STORAGE_ACCOUNT_NAME=$(az deployment group show -g $RGNAME -n cert-0001 --query properties.outputs.storageAccountName.value -o tsv)
