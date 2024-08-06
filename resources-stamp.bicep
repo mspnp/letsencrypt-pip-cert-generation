@@ -10,6 +10,9 @@ param ipResourceId string = 'newIp'
 @description('Microsoft Entra principal ID for the user running the deployment. The user will be granted the Storage Blob Data Contributor role on the storage account.')
 param userPrincipalId string
 
+@description('The IP address for the user running the deployment. The IP address will be added to the storage account network ACL.')
+param currentIPAddress string
+
 var normalizedSubdomain = replace(subdomainName, '.', '')
 var storageAccountName = replace(replace(normalizedSubdomain, '_', ''), '-', '')
 var appGatewayPublicIPAddressResourceId = ((ipResourceId == 'newIp') ? publicIPAddress.id : ipResourceId)
@@ -32,7 +35,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2020-11-01' = if (
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-01-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
   sku: {
@@ -45,9 +48,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-01-01' = {
     allowSharedKeyAccess: true
     networkAcls: {
       bypass: 'AzureServices'
-      virtualNetworkRules: []
-      ipRules: []
-      defaultAction: 'Allow'
+      virtualNetworkRules: [
+        {
+          id: virtualNetwork::subnet.id
+          action: 'Allow'
+        }
+      ]
+      ipRules: [
+        {
+          value: currentIPAddress
+          action: 'Allow'
+        }        
+      ]
+      defaultAction: 'Deny'
     }
     supportsHttpsTrafficOnly: true
     encryption: {
@@ -86,6 +99,11 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
         name: subnetName
         properties: {
           addressPrefix: '172.20.0.0/24'
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.Storage'
+            }
+          ]
         }
       }
     ]

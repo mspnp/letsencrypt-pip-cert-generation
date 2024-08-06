@@ -8,18 +8,20 @@ RGNAME="rg-lets-encrypt-cert-validator-${LOCATION}"
 FQDN=$(az network public-ip show --ids $IP_RESOURCE_ID --query dnsSettings.fqdn -o tsv)
 SUBDOMAIN=$(az network public-ip show --ids $IP_RESOURCE_ID --query dnsSettings.domainNameLabel -o tsv)
 USER_PRINCIPAL_ID=$(az ad signed-in-user show --query id --output tsv)
+CURRENT_IP_ADDRESS=$(curl -s -4 https://ifconfig.io)
 
 echo "Location: $LOCATION"
 echo "DNS Prefix: $SUBDOMAIN"
 echo "FQDN: $FQDN"
 echo "Existing IP Resource ID: $IP_RESOURCE_ID"
 echo "User Principal ID: $USER_PRINCIPAL_ID"
+echo "Current IP Address: $CURRENT_IP_ADDRESS"
 
 echo "Creating temporary Resource Group $RGNAME"
 az group create -n $RGNAME -l $LOCATION
 
 echo "Deploying Azure resources used in validation; this may take 20 minutes."
-az deployment group create -g $RGNAME -f resources-stamp.bicep -n $SUBDOMAIN -p location=${LOCATION} subdomainName=${SUBDOMAIN} ipResourceId=${IP_RESOURCE_ID} userPrincipalId=${USER_PRINCIPAL_ID}
+az deployment group create -g $RGNAME -f resources-stamp.bicep -n $SUBDOMAIN -p location=${LOCATION} subdomainName=${SUBDOMAIN} ipResourceId=${IP_RESOURCE_ID} userPrincipalId=${USER_PRINCIPAL_ID} currentIPAddress=${CURRENT_IP_ADDRESS}
 
 STORAGE_ACCOUNT_NAME=$(az deployment group show -g $RGNAME -n $SUBDOMAIN --query properties.outputs.storageAccountName.value -o tsv)
 
