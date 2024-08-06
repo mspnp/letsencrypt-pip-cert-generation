@@ -32,6 +32,9 @@ echo "Uploading placeholder to storage"
 echo pong>ping.txt
 az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode login
 
+echo "Waiting for website to be ready"
+curl --retry 10 --retry-delay 10 -s -4 http://$FQDN/ping
+
 echo "Starting cert generation and validation"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 certbot certonly --manual --manual-auth-hook "${DIR}/authenticator.sh ${STORAGE_ACCOUNT_NAME}" -d $FQDN --config-dir ./certs/etc/letsencrypt --work-dir ./certs/var/lib/letsencrypt --logs-dir ./certs/var/log/letsencrypt
