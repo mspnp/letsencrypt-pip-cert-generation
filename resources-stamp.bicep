@@ -7,6 +7,9 @@ param location string
 @description('Existing Public IP resource ID or \'newIp\' to indicate an IP address should be created.')
 param ipResourceId string = 'newIp'
 
+@description('Microsoft Entra principal ID for the user running the deployment. The user will be granted the Storage Blob Data Contributor role on the storage account.')
+param userPrincipalId string
+
 var normalizedSubdomain = replace(subdomainName, '.', '')
 var storageAccountName = replace(replace(normalizedSubdomain, '_', ''), '-', '')
 var appGatewayPublicIPAddressResourceId = ((ipResourceId == 'newIp') ? publicIPAddress.id : ipResourceId)
@@ -54,6 +57,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-01-01' = {
       keySource: 'Microsoft.Storage'
     }
     accessTier: 'Hot'
+  }
+}
+
+var storageAccountStorageBlobDataContributorRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // as per https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#:~:text=ba92f5b4-2d11-453d-a403-e96b0029c9fe
+
+resource roleAssignmentStorageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: storageAccount
+  name: guid(resourceGroup().id, userPrincipalId, storageAccountStorageBlobDataContributorRoleDefinitionId)
+  properties: {
+    roleDefinitionId: storageAccountStorageBlobDataContributorRoleDefinitionId
+    principalId: userPrincipalId
+    principalType: 'User'
   }
 }
 

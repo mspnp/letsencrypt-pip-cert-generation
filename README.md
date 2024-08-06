@@ -63,7 +63,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    echo pong>ping.txt
    
    # Upload that file
-   az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode key
+   az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode login
    ```
 
 - :heavy_check_mark: Checking if the resources created are working
@@ -105,7 +105,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
         -c \$web                                               \
         -n "-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk"       \
         -f "./-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk.txt" \
-        --auth-mode key
+        --auth-mode login
       ```
 
    1. Test the url that certbot is expecting. (Should receive the text from above.)
