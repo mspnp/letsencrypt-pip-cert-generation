@@ -3,6 +3,7 @@
 In Azure there are services that do not support self-signed certificates (Ex. Azure Front Door).  In order to do some testing on Azure, we can create a public and valid CA certificate for free. This article allows you generate a CA certificate for your Public IP's domain prefix (i.e. `your-prefix.the-region.cloudapp.azure.com`).
 
 It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a non-profit certificate authority run by Internet Security Research Group (ISRG) that provides X.509 certificates for Transport Layer Security (TLS) encryption at no charge.
+
 ## Prerequisites
 
 1. An Azure subscription. If you don't have an Azure subscription, you can create a [free account](https://azure.microsoft.com/free).
@@ -35,7 +36,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    LOCATION=eastus
    
    # Your subdomain (prefix) name
-   DOMAIN_NAME=mysubdomain
+   DOMAIN_NAME=contoso
    
    # Set your domain name
    FQDN="${DOMAIN_NAME}.${LOCATION}.cloudapp.azure.com"
@@ -63,7 +64,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    echo pong>ping.txt
    
    # Upload that file
-   az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode key
+   az storage blob upload --account-name $STORAGE_ACCOUNT_NAME -c \$web -n ping -f ./ping.txt --auth-mode login
    ```
 
 - :heavy_check_mark: Checking if the resources created are working
@@ -89,12 +90,25 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
 
    Before pressing Enter, you need to follow the Certbot instructions in another console window.
 
-   ![Console output from certbot](./cerbot.png)
+   ```output
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+   Create a file containing just this data:
+
+   A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u.C2dE3fH4iJ5kL6mN7oP8qR9sT0uV1w
+
+   And make it available on your web server at this URL:
+
+   http://contoso.eastus.cloudapp.azure.com/-well-known/acme-challenge/A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+   Press Enter to Continue
+   ```
 
    1. Create a file name with the name presented by Certbot during the execution, with a `.txt` extension and add the content inside as instructed. For example,
 
    ```bash
-   echo "-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk.T_a4tluV9By4PqiMY4Xz5iLe5ty1whK_vNK21LY6ZTU">-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk.txt
+   echo "A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u.C2dE3fH4iJ5kL6mN7oP8qR9sT0uV1w">A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u.txt
    ```
 
    1. Upload the generated file inside the _$web_ container in any way (by command line or azure portal as you prefer) Ex:
@@ -103,15 +117,15 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
       az storage blob upload                                   \
         --account-name $STORAGE_ACCOUNT_NAME                   \
         -c \$web                                               \
-        -n "-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk"       \
-        -f "./-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk.txt" \
-        --auth-mode key
+        -n "A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u"       \
+        -f "./A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u.txt" \
+        --auth-mode login
       ```
 
    1. Test the url that certbot is expecting. (Should receive the text from above.)
 
       ```bash
-      curl http://${FQDN}/.well-known/acme-challenge/-Nahn2wS1fLeqGwqjDBIWxSpL5U4mlb_oA50wsPeoqk
+      curl http://${FQDN}/.well-known/acme-challenge/A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u
       ```
 
    1. If the test is working, please press Enter
