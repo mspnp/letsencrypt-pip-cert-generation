@@ -3,6 +3,7 @@
 In Azure there are services that do not support self-signed certificates (Ex. Azure Front Door).  In order to do some testing on Azure, we can create a public and valid CA certificate for free. This article allows you generate a CA certificate for your Public IP's domain prefix (i.e. `your-prefix.the-region.cloudapp.azure.com`).
 
 It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a non-profit certificate authority run by Internet Security Research Group (ISRG) that provides X.509 certificates for Transport Layer Security (TLS) encryption at no charge.
+
 ## Prerequisites
 
 1. An Azure subscription. If you don't have an Azure subscription, you can create a [free account](https://azure.microsoft.com/free).
@@ -35,7 +36,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
    LOCATION=eastus
    
    # Your subdomain (prefix) name
-   DOMAIN_NAME=mysubdomain
+   DOMAIN_NAME=contoso
    
    # Set your domain name
    FQDN="${DOMAIN_NAME}.${LOCATION}.cloudapp.azure.com"
@@ -98,7 +99,7 @@ It is based on [Let's Encrypt®](https://letsencrypt.org). Let's Encrypt is a no
 
    And make it available on your web server at this URL:
 
-   http://mysubdomain.eastus.cloudapp.azure.com/-well-known/acme-challenge/A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u
+   http://contoso.eastus.cloudapp.azure.com/-well-known/acme-challenge/A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
    Press Enter to Continue
